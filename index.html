@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔥 Chimoco Mission Control</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="logo">
+                <span class="fire">🔥</span>
+                <h1>CHIMOCO MISSION CONTROL</h1>
+                <span class="subtitle">Assistente Pessoal de Yuri</span>
+            </div>
+            <div class="status-badge">
+                <span class="status-light online"></span>
+                <span class="status-text">ONLINE</span>
+            </div>
+        </header>
+
+        <!-- MAIN GRID -->
+        <main class="mission-grid">
+            
+            <!-- CURRENT TASK -->
+            <section class="panel current-task">
+                <h2>📋 TAREFA ATUAL</h2>
+                <div class="task-content">
+                    <div class="task-name" id="taskName">Aguardando tarefa...</div>
+                    <div class="task-status" id="taskStatus">IDLE</div>
+                    <div class="task-timer" id="taskTimer">00:00:00</div>
+                </div>
+            </section>
+
+            <!-- THINKING/REASONING -->
+            <section class="panel thinking-panel">
+                <h2>🧠 PENSAMENTO EM TEMPO REAL</h2>
+                <div class="thinking-content" id="thinkingContent">
+                    <p class="placeholder">Pensamento do Chimoco aparecerá aqui...</p>
+                </div>
+            </section>
+
+            <!-- ACTIVE MODELS -->
+            <section class="panel models">
+                <h2>⚙️ MODELOS ATIVOS</h2>
+                <div class="model-list">
+                    <div class="model-item primary">
+                        <span class="model-name">Haiku</span>
+                        <span class="model-status">✓ ATIVO</span>
+                    </div>
+                    <div class="model-item fallback">
+                        <span class="model-name">Gemini</span>
+                        <span class="model-status">STANDBY</span>
+                    </div>
+                    <div class="model-item fallback">
+                        <span class="model-name">OpenAI</span>
+                        <span class="model-status">STANDBY</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- CALENDAR -->
+            <section class="panel calendar">
+                <h2>📅 PRÓXIMOS EVENTOS</h2>
+                <div class="calendar-content" id="calendarContent">
+                    <div class="event-item">
+                        <span class="event-time">12:00</span>
+                        <span class="event-name">Almoço com Puzzle</span>
+                        <span class="event-date">19 Fev</span>
+                    </div>
+                    <div class="event-item">
+                        <span class="event-time">09:00</span>
+                        <span class="event-name">Limpeza da Casa</span>
+                        <span class="event-date">23 Fev</span>
+                    </div>
+                    <div class="event-item">
+                        <span class="event-time">20:00</span>
+                        <span class="event-name">Concerto Mizzy Miles</span>
+                        <span class="event-date">27 Fev</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STATISTICS -->
+            <section class="panel statistics">
+                <h2>📊 ESTATÍSTICAS</h2>
+                <div class="stats-grid">
+                    <div class="stat">
+                        <span class="stat-number" id="tasksToday">0</span>
+                        <span class="stat-label">Tarefas Hoje</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="uptime">99.9%</span>
+                        <span class="stat-label">Uptime</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" id="avgTime">2.3s</span>
+                        <span class="stat-label">Tempo Médio</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TASK HISTORY -->
+            <section class="panel history">
+                <h2>📜 HISTÓRICO (últimas 5)</h2>
+                <div class="history-content" id="historyContent">
+                    <div class="history-item">
+                        <span class="time">21:03</span>
+                        <span class="action">Criou evento: Almoço com Puzzle</span>
+                        <span class="status">✓</span>
+                    </div>
+                    <div class="history-item">
+                        <span class="time">21:02</span>
+                        <span class="action">Editou evento: Limpeza da Casa</span>
+                        <span class="status">✓</span>
+                    </div>
+                    <div class="history-item">
+                        <span class="time">20:51</span>
+                        <span class="action">Listou calendários iCloud</span>
+                        <span class="status">✓</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RESOURCES -->
+            <section class="panel resources">
+                <h2>💻 RECURSOS</h2>
+                <div class="resource-item">
+                    <span class="resource-label">Memória</span>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 45%"></div>
+                    </div>
+                    <span class="resource-value">45%</span>
+                </div>
+                <div class="resource-item">
+                    <span class="resource-label">CPU</span>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 12%"></div>
+                    </div>
+                    <span class="resource-value">12%</span>
+                </div>
+                <div class="resource-item">
+                    <span class="resource-label">Modelos Disponíveis</span>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 100%"></div>
+                    </div>
+                    <span class="resource-value">3/3</span>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <p>Chimoco | Assistente Pessoal de Yuri | Mission Control v1.0</p>
+            <p>Última atualização: <span id="lastUpdate">agora</span></p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
