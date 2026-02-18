@@ -1,9 +1,19 @@
 // CHIMOCO MISSION CONTROL - WEBSOCKET CLIENT
 
 // Configurar conexão WebSocket
-const SERVER_URL = window.location.hostname === 'localhost' 
-  ? 'ws://localhost:3000' 
-  : 'ws://' + window.location.hostname + ':3000';
+const SERVER_URL = (() => {
+  // Se é localhost, conecta direto
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'ws://localhost:3000';
+  }
+  // Se é GitHub Pages, conecta ao servidor AWS
+  if (window.location.hostname.includes('github.io')) {
+    // MUDAR ISTO PARA O IP/DOMINIO DO TEU AWS
+    return 'ws://localhost:3000'; // Por enquanto, só localhost
+  }
+  // Default
+  return 'ws://localhost:3000';
+})();
 
 let ws = null;
 let taskStartTime = null;
@@ -35,13 +45,20 @@ function connectWebSocket() {
     ws.onclose = () => {
       console.log('⚠️ Desconectado do servidor');
       document.querySelector('.status-light').classList.remove('online');
-      document.querySelector('.status-text').textContent = 'OFFLINE';
+      document.querySelector('.status-text').textContent = 'DEMO MODE';
+      
+      // Mostrar modo demo
+      const thinkingContent = document.getElementById('thinkingContent');
+      thinkingContent.innerHTML = `
+        <p style="color: #ffb84d;">ℹ️ Modo Demo - Servidor local não disponível</p>
+        <p style="color: #888; font-size: 11px;">Para conexão real, abra em http://localhost:3000</p>
+      `;
       
       // Tentar reconectar
       if (reconnectAttempts < MAX_RECONNECT) {
         reconnectAttempts++;
         console.log(`Tentando reconectar... (${reconnectAttempts}/${MAX_RECONNECT})`);
-        setTimeout(connectWebSocket, 3000);
+        setTimeout(connectWebSocket, 5000);
       }
     };
   } catch (error) {
