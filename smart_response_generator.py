@@ -36,6 +36,8 @@ def generate_smart_response(message_text, model='Haiku'):
         return generate_gemini_response(message_text, detected_intent)
     elif model == 'OpenAI':
         return generate_openai_response(message_text, detected_intent)
+    elif model == 'KIMI':
+        return generate_kimi_response(message_text, detected_intent)
     else:
         return generate_generic_response(message_text, detected_intent)
 
@@ -98,6 +100,25 @@ def generate_openai_response(message, intent):
         return "Ah, um artista! A música é a alma expressada em som. Vamos transformar os teus sets em experiências memoráveis. Cada track, cada beat, é uma oportunidade de conectar com as pessoas. Como posso amplificar a tua visão artística?"
     else:
         return f"'{message}' - estas palavras abrem portas pra conversas infinitas. Vejo potencial aqui. Vamos explorar juntos? Partilha mais da tua perspectiva e deixa-me responder com criatividade e genuinidade."
+
+def generate_kimi_response(message, intent):
+    """KIMI: Avançado, reflexivo, contextual"""
+    
+    if intent == 'greeting':
+        return "你好！我是Chimoco，一个高级AI助手。我在这里帮助Yuri处理各种任务。用KIMI k2.5模型,我可以提供更深入的分析和理解。你好吗？ (Olá! Sou Chimoco com KIMI k2.5. Como posso ajudar?)"
+    elif intent == 'help':
+        return f"Entendo que precisas de ajuda com '{message}'. Com KIMI k2.5, posso oferecer análise profunda, compreensão contextual e soluções refletidas. Qual é exatamente o desafio que enfrentas?"
+    elif intent == 'time':
+        import time
+        return f"São {time.strftime('%H:%M')}. KIMI está aqui para te ajudar a maximizar este tempo precioso. O que precisas?"
+    elif intent == 'events':
+        return "Os eventos são oportunidades. Com KIMI k2.5, posso ajudar a analisar padrões no calendário, otimizar agenda e sugerir conexões entre eventos. Qual aspecto quer explorar?"
+    elif intent == 'about':
+        return "Sou Chimoco, agora alimentado por KIMI k2.5 - um modelo avançado capaz de raciocínio profundo, análise contextual e compreensão nuançada. Ofereci soluções inteligentes e reflexivas."
+    elif intent == 'dj':
+        return "DJ é arte. KIMI pode ajudar a analisar mix patterns, identificar transições ideais, sugerir tracks baseadas em harmonia e fluxo emocional. Qual é tua visão artística?"
+    else:
+        return f"'{message}' - KIMI está aqui para processar isto com profundidade. Deixa-me refletir e oferecer a melhor compreensão possível. Podes elaborar?"
 
 def generate_generic_response(message, intent):
     """Generic: Fallback quando modelo é desconhecido"""
