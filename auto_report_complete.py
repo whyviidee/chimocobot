@@ -8,23 +8,23 @@ from mission_control_client import report
 from process_dashboard_message import process_and_respond
 
 def report_receive(message_text):
-    """Report incoming message"""
+    """Report incoming message to dashboard"""
     report("receive", message_text[:100])
 
 def report_thinking(thought_text):
-    """Report thinking process"""
-    report("thinking", thought_text)
+    """Report thinking - DISABLED for ChatGPT style (clean chat)"""
+    # Skip thinking reports for clean UI
+    pass
 
 def report_response(response_text, model='Haiku'):
     """
-    Report response - sends to BOTH:
-    1. Mission Control (history)
-    2. Dashboard (live feedback)
+    Report FINAL response only - ChatGPT style
+    Sends to: 1. Mission Control (history), 2. Dashboard (live)
     """
-    # Mission Control
+    # Mission Control (for logging)
     report("respond", response_text[:200])
     
-    # Dashboard
+    # Dashboard (show final response)
     try:
         process_and_respond(response_text, model=model, response_text=response_text)
     except Exception as e:

@@ -81,6 +81,9 @@ function updateTaskUI(task) {
   if (taskStatus) taskStatus.textContent = task.status || 'IDLE';
 }
 
+// Track messages to prevent duplicates
+let lastMessageHash = '';
+
 function addThinkingLine(text) {
   const thinkingContent = document.getElementById('thinkingContent');
   if (!thinkingContent) return;
@@ -89,16 +92,32 @@ function addThinkingLine(text) {
   const placeholder = thinkingContent.querySelector('.placeholder');
   if (placeholder) placeholder.remove();
   
+  // CHATGPT STYLE: Only show user messages and final responses
+  const isUserMessage = text.includes('📨') || text.includes('Yuri:');
+  const isResponse = text.includes('📤') || text.includes('✅ Resposta:') || text.includes('Resposta:');
+  
+  // Skip thinking/processing messages (keep chat clean)
+  const shouldSkip = text.includes('💭') || text.includes('Processando') || text.includes('pensamento') || 
+                     text.includes('Erro ao processar');
+  
+  if (shouldSkip) {
+    return; // Don't display thinking steps
+  }
+  
+  // Check for duplicate
+  if (lastMessageHash === text) {
+    return; // Skip duplicates
+  }
+  lastMessageHash = text;
+  
   const line = document.createElement('div');
   line.textContent = text;
   
   // Categorize message type
-  if (text.includes('📨') || text.includes('Yuri:')) {
+  if (isUserMessage) {
     line.className = 'user-message';
-  } else if (text.includes('📤') || text.includes('✅ Resposta:') || text.includes('Resposta:')) {
+  } else if (isResponse) {
     line.className = 'response';
-  } else if (text.includes('💭') || text.includes('Processando') || text.includes('pensamento')) {
-    line.className = 'thinking';
   }
   
   // Prevent wrapping with ellipsis
@@ -107,8 +126,6 @@ function addThinkingLine(text) {
   line.style.maxWidth = '100%';
   
   thinkingContent.appendChild(line);
-  
-  thinkingLines++;
   
   // Auto-scroll
   setTimeout(() => {

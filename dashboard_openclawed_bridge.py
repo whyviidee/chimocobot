@@ -14,31 +14,27 @@ MISSION_SERVER = "https://16.16.255.70:3000"
 
 def process_dashboard_input(message_text, model='Haiku'):
     """
-    Main function to process dashboard input
-    Receives message, processes it, and returns response
+    Main function to process dashboard input - ChatGPT style
+    Receives message, processes it, and returns response (clean, no duplicates)
     """
     print(f"\n📨 Dashboard Input: {message_text}")
     print(f"🤖 Model: {model}")
     
     try:
-        # Step 1: Report receiving
+        # Step 1: Report incoming message (user's message)
         report_receive(message_text)
         
-        # Step 2: Start processing
-        report_thinking(f"Processando com {model}...")
-        
-        # Step 3: Generate response (simulated - in real setup would call LLM)
+        # Step 2: Generate response (NO "Processando..." noise)
         response = generate_response(message_text, model)
         
-        # Step 4: Report response back (with GREEN marker)
-        report_response(f"✅ Resposta: {response}", model=model)
+        # Step 3: Report response back (FINAL ANSWER ONLY)
+        report_response(response, model=model)
         
         print(f"✅ Response sent: {response}")
         return response
         
     except Exception as e:
         print(f"❌ Error: {e}")
-        report_thinking(f"Erro ao processar: {e}")
         return None
 
 def generate_response(message_text, model='Haiku'):
