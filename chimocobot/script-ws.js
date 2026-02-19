@@ -81,8 +81,8 @@ function updateTaskUI(task) {
   if (taskStatus) taskStatus.textContent = task.status || 'IDLE';
 }
 
-// Track messages to prevent duplicates
-let lastMessageHash = '';
+// Track messages to prevent duplicates - use message ID
+let processedMessages = new Set();
 
 function addThinkingLine(text) {
   const thinkingContent = document.getElementById('thinkingContent');
@@ -94,7 +94,7 @@ function addThinkingLine(text) {
   
   // CHATGPT STYLE: Only show user messages and final responses
   const isUserMessage = text.includes('📨') || text.includes('Yuri:');
-  const isResponse = text.includes('📤') || text.includes('✅ Resposta:') || text.includes('Resposta:');
+  const isResponse = text.includes('📤') || text.includes('✅') || text.includes('Resposta:');
   
   // Skip thinking/processing messages (keep chat clean)
   const shouldSkip = text.includes('💭') || text.includes('Processando') || text.includes('pensamento') || 
@@ -104,11 +104,19 @@ function addThinkingLine(text) {
     return; // Don't display thinking steps
   }
   
+  // Create unique ID for this message
+  const messageHash = `${isUserMessage ? 'user' : 'response'}_${text.substring(0, 50)}`;
+  
   // Check for duplicate
-  if (lastMessageHash === text) {
-    return; // Skip duplicates
+  if (processedMessages.has(messageHash)) {
+    return; // Skip exact duplicates
   }
-  lastMessageHash = text;
+  processedMessages.add(messageHash);
+  
+  // Limit history to prevent memory issues
+  if (processedMessages.size > 100) {
+    processedMessages.clear();
+  }
   
   const line = document.createElement('div');
   line.textContent = text;
@@ -127,10 +135,32 @@ function addThinkingLine(text) {
   
   thinkingContent.appendChild(line);
   
+  // Add to history automatically
+  addToHistory(text, isUserMessage);
+  
   // Auto-scroll
   setTimeout(() => {
     thinkingContent.scrollTop = thinkingContent.scrollHeight;
   }, 10);
+}
+
+function addToHistory(text, isUserMessage) {
+  const historyList = document.getElementById('historyList');
+  if (!historyList) return;
+  
+  const historyItem = document.createElement('div');
+  historyItem.className = 'history-item';
+  
+  const time = new Date().toLocaleTimeString('pt-PT');
+  const prefix = isUserMessage ? '📨 Yuri' : '📤 Chimoco';
+  
+  historyItem.textContent = `${time} - ${prefix}: ${text.substring(0, 50)}...`;
+  historyList.insertBefore(historyItem, historyList.firstChild);
+  
+  // Keep only last 10 items
+  while (historyList.children.length > 10) {
+    historyList.removeChild(historyList.lastChild);
+  }
 }
 
 function updateHistoryUI(history) {
