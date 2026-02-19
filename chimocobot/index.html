@@ -4,16 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🔥 Chimoco Mission Control</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style-v2.css?v=2">
 </head>
 <body>
-    <div class="container" style="display: flex; flex-direction: column; height: 100vh;">
+    <div class="app-container">
         <!-- HEADER -->
         <header class="header">
             <div class="logo">
                 <span class="fire">🔥</span>
                 <h1>CHIMOCO MISSION CONTROL</h1>
-                <span class="subtitle">Assistente Pessoal de Yuri</span>
             </div>
             <div class="status-badge">
                 <span class="status-light online"></span>
@@ -21,153 +20,93 @@
             </div>
         </header>
 
-        <!-- MAIN GRID -->
-        <main class="mission-grid" style="overflow-y: auto; flex: 1; padding-bottom: 300px;">
-            
-            <!-- CURRENT TASK -->
-            <section class="panel current-task">
-                <h2>📋 TAREFA ATUAL</h2>
-                <div class="task-content">
-                    <div class="task-name" id="taskName">Aguardando tarefa...</div>
-                    <div class="task-status" id="taskStatus">IDLE</div>
-                    <div class="task-timer" id="taskTimer">00:00:00</div>
-                </div>
-            </section>
+        <div class="main-layout">
+            <!-- LEFT SIDEBAR -->
+            <aside class="sidebar">
+                <!-- TAREFA ATUAL -->
+                <section class="card">
+                    <h3>📋 TAREFA</h3>
+                    <div id="taskName" class="task-title">Aguardando...</div>
+                    <div id="taskStatus" class="task-status">IDLE</div>
+                    <div id="taskTimer" class="task-timer">00:00:00</div>
+                </section>
 
-            <!-- THINKING/REASONING -->
-            <section class="panel thinking-panel">
-                <h2>🧠 PENSAMENTO EM TEMPO REAL</h2>
-                <div class="thinking-content" id="thinkingContent">
-                    <p class="placeholder">Pensamento do Chimoco aparecerá aqui...</p>
-                </div>
-            </section>
+                <!-- MODELOS -->
+                <section class="card">
+                    <h3>🤖 MODELO</h3>
+                    <div class="model-list">
+                        <div class="model-btn" data-model="Haiku">
+                            <span class="model-icon">H</span>
+                            <span class="model-label">Haiku</span>
+                        </div>
+                        <div class="model-btn" data-model="Gemini">
+                            <span class="model-icon">G</span>
+                            <span class="model-label">Gemini</span>
+                        </div>
+                        <div class="model-btn" data-model="OpenAI">
+                            <span class="model-icon">O</span>
+                            <span class="model-label">OpenAI</span>
+                        </div>
+                    </div>
+                </section>
 
-            <!-- ACTIVE MODELS -->
-            <section class="panel models">
-                <h2>⚙️ MODELOS ATIVOS</h2>
-                <div class="model-list">
-                    <div class="model-item primary">
-                        <span class="model-name">Haiku</span>
-                        <span class="model-status">✓ ATIVO</span>
+                <!-- STATS -->
+                <section class="card">
+                    <h3>📊 STATS</h3>
+                    <div class="stat-row">
+                        <span class="stat-label">Tarefas</span>
+                        <span class="stat-value" id="tasksCount">0</span>
                     </div>
-                    <div class="model-item fallback">
-                        <span class="model-name">Gemini</span>
-                        <span class="model-status">STANDBY</span>
-                    </div>
-                    <div class="model-item fallback">
-                        <span class="model-name">OpenAI</span>
-                        <span class="model-status">STANDBY</span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- CALENDAR -->
-            <section class="panel calendar">
-                <h2>📅 PRÓXIMOS EVENTOS</h2>
-                <div class="calendar-content" id="calendarContent">
-                    <div class="event-item">
-                        <span class="event-time">12:00</span>
-                        <span class="event-name">Almoço com Puzzle</span>
-                        <span class="event-date">19 Fev</span>
-                    </div>
-                    <div class="event-item">
-                        <span class="event-time">09:00</span>
-                        <span class="event-name">Limpeza da Casa</span>
-                        <span class="event-date">23 Fev</span>
-                    </div>
-                    <div class="event-item">
-                        <span class="event-time">20:00</span>
-                        <span class="event-name">Concerto Mizzy Miles</span>
-                        <span class="event-date">27 Fev</span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- STATISTICS -->
-            <section class="panel statistics">
-                <h2>📊 ESTATÍSTICAS</h2>
-                <div class="stats-grid">
-                    <div class="stat">
-                        <span class="stat-number" id="tasksToday">0</span>
-                        <span class="stat-label">Tarefas Hoje</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number" id="uptime">99.9%</span>
+                    <div class="stat-row">
                         <span class="stat-label">Uptime</span>
+                        <span class="stat-value">99.9%</span>
                     </div>
-                    <div class="stat">
-                        <span class="stat-number" id="avgTime">2.3s</span>
-                        <span class="stat-label">Tempo Médio</span>
-                    </div>
-                </div>
-            </section>
+                </section>
 
-            <!-- TASK HISTORY -->
-            <section class="panel history">
-                <h2>📜 HISTÓRICO (últimas 5)</h2>
-                <div class="history-content" id="historyContent">
-                    <div class="history-item">
-                        <span class="time">21:03</span>
-                        <span class="action">Criou evento: Almoço com Puzzle</span>
-                        <span class="status">✓</span>
+                <!-- PRÓXIMOS EVENTOS -->
+                <section class="card">
+                    <h3>📅 EVENTOS</h3>
+                    <div class="events-list">
+                        <div class="event">12:00 - Almoço com Puzzle</div>
+                        <div class="event">09:00 - Limpeza da Casa</div>
+                        <div class="event">20:00 - Concerto Mizzy Miles</div>
                     </div>
-                    <div class="history-item">
-                        <span class="time">21:02</span>
-                        <span class="action">Editou evento: Limpeza da Casa</span>
-                        <span class="status">✓</span>
-                    </div>
-                    <div class="history-item">
-                        <span class="time">20:51</span>
-                        <span class="action">Listou calendários iCloud</span>
-                        <span class="status">✓</span>
-                    </div>
-                </div>
-            </section>
+                </section>
+            </aside>
 
-            <!-- RESOURCES -->
-            <section class="panel resources">
-                <h2>💻 RECURSOS</h2>
-                <div class="resource-item">
-                    <span class="resource-label">Memória</span>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 45%"></div>
+            <!-- MAIN CONTENT -->
+            <main class="content">
+                <!-- PENSAMENTO EM TEMPO REAL -->
+                <section class="thinking-section">
+                    <div class="thinking-header">
+                        <h2>💭 PENSAMENTO EM TEMPO REAL</h2>
+                        <span class="thinking-count" id="thinkingCount">0 linhas</span>
                     </div>
-                    <span class="resource-value">45%</span>
-                </div>
-                <div class="resource-item">
-                    <span class="resource-label">CPU</span>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 12%"></div>
+                    <div id="thinkingContent" class="thinking-content">
+                        <div class="placeholder">Esperando pensamentos...</div>
                     </div>
-                    <span class="resource-value">12%</span>
-                </div>
-                <div class="resource-item">
-                    <span class="resource-label">Modelos Disponíveis</span>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 100%"></div>
-                    </div>
-                    <span class="resource-value">3/3</span>
-                </div>
-            </section>
+                </section>
 
-        </main>
+                <!-- HISTÓRICO -->
+                <section class="history-section">
+                    <h2>📜 HISTÓRICO (ÚLTIMAS 5)</h2>
+                    <div id="historyList" class="history-list">
+                        <div class="history-item">Aguardando ações...</div>
+                    </div>
+                </section>
+            </main>
+        </div>
 
-        <!-- CHAT INPUT -->
-        <section class="chat-section">
-            <div class="chat-input-container">
+        <!-- FOOTER - CHAT INPUT -->
+        <footer class="chat-footer">
+            <div class="chat-container">
                 <input type="text" id="chatInput" placeholder="Escreve aqui... (Yuri)" class="chat-input">
-                <button id="chatSend" class="chat-send">Enviar</button>
+                <button id="chatSend" class="chat-send">ENVIAR</button>
             </div>
-            <div id="chatResponse" class="chat-response" style="display:none;"></div>
-        </section>
-
-        <!-- FOOTER -->
-        <footer class="footer">
-            <p>Chimoco | Assistente Pessoal de Yuri | Mission Control v1.0</p>
-            <p>Última atualização: <span id="lastUpdate">agora</span></p>
+            <div id="chatResponse" class="chat-response"></div>
         </footer>
     </div>
 
-    <script src="script-ws.js?v=999999"></script>
+    <script src="script-ws.js?v=2"></script>
 </body>
 </html>

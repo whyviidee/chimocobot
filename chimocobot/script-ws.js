@@ -1,8 +1,10 @@
-// CHIMOCO MISSION CONTROL - WEBSOCKET CLIENT
+// CHIMOCO MISSION CONTROL - WEBSOCKET CLIENT v2
 
 const SERVER_URL = 'wss://16.16.255.70:3000';
 let ws = null;
 let taskStartTime = null;
+let selectedModel = 'Haiku';
+let thinkingLines = 0;
 
 function connectWebSocket() {
   try {
@@ -16,7 +18,7 @@ function connectWebSocket() {
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        console.log('📨 Mensagem recebida:', data);
+        console.log('📨 Mensagem:', data.type);
         
         if (data.type === 'init') {
           if (data.currentTask) updateTaskUI(data.currentTask);
@@ -30,7 +32,7 @@ function connectWebSocket() {
           if (data.history) updateHistoryUI(data.history);
         }
       } catch (e) {
-        console.error('Erro ao processar mensagem:', e);
+        console.error('Erro ao processar:', e);
       }
     };
     
@@ -39,12 +41,12 @@ function connectWebSocket() {
     };
     
     ws.onclose = () => {
-      console.log('⚠️ Desconectado do servidor');
-      updateStatus('DEMO MODE');
+      console.log('⚠️ Desconectado');
+      updateStatus('OFFLINE');
       setTimeout(connectWebSocket, 3000);
     };
   } catch (err) {
-    console.error('Erro ao conectar:', err);
+    console.error('Erro:', err);
   }
 }
 
@@ -52,14 +54,12 @@ function updateStatus(status) {
   const statusEl = document.querySelector('.status-text');
   const lightEl = document.querySelector('.status-light');
   
-  if (statusEl) {
-    statusEl.textContent = status;
-    if (lightEl) {
-      if (status === 'ONLINE') {
-        lightEl.classList.add('online');
-      } else {
-        lightEl.classList.remove('online');
-      }
+  if (statusEl) statusEl.textContent = status;
+  if (lightEl) {
+    if (status === 'ONLINE') {
+      lightEl.classList.add('online');
+    } else {
+      lightEl.classList.remove('online');
     }
   }
 }
@@ -69,30 +69,33 @@ function updateTaskUI(task) {
   
   const taskName = document.getElementById('taskName');
   const taskStatus = document.getElementById('taskStatus');
-  const taskTimer = document.getElementById('taskTimer');
   
   if (taskName) taskName.textContent = task.taskName || 'Sem tarefa';
   if (taskStatus) taskStatus.textContent = task.status || 'IDLE';
-  if (taskTimer) taskTimer.textContent = '00:00:00';
 }
 
 function addThinkingLine(text) {
   const thinkingContent = document.getElementById('thinkingContent');
   if (!thinkingContent) return;
   
-  // Remover placeholder se existir
+  // Remove placeholder
   const placeholder = thinkingContent.querySelector('.placeholder');
   if (placeholder) placeholder.remove();
   
   const line = document.createElement('div');
-  line.className = 'thinking-line';
   line.textContent = '→ ' + text;
   thinkingContent.appendChild(line);
+  
+  thinkingLines++;
+  const counter = document.getElementById('thinkingCount');
+  if (counter) counter.textContent = thinkingLines + ' linhas';
+  
+  // Auto-scroll
   thinkingContent.scrollTop = thinkingContent.scrollHeight;
 }
 
 function updateHistoryUI(history) {
-  const historyList = document.querySelector('[data-section="historico"] .history-list');
+  const historyList = document.getElementById('historyList');
   if (!historyList || !history) return;
   
   historyList.innerHTML = '';
@@ -100,16 +103,11 @@ function updateHistoryUI(history) {
     const itemEl = document.createElement('div');
     itemEl.className = 'history-item';
     const time = new Date(item.timestamp).toLocaleTimeString('pt-PT');
-    itemEl.innerHTML = `
-      <span class="history-time">${time}</span>
-      <span class="history-task">${item.taskName}</span>
-      <span class="history-check">✓</span>
-    `;
+    itemEl.textContent = `${time} - ${item.taskName}`;
     historyList.appendChild(itemEl);
   });
 }
 
-// Timer do relógio
 function updateTimer() {
   if (taskStartTime) {
     const elapsed = Math.floor((Date.now() - taskStartTime) / 1000);
@@ -122,44 +120,33 @@ function updateTimer() {
   }
 }
 
-// GLOBAL: Current selected model
-let selectedModel = 'Haiku';
-
-// Make models clickable
+// MODEL SELECTION
 function setupModelSelection() {
-  const modelItems = document.querySelectorAll('.model-item');
+  const modelBtns = document.querySelectorAll('.model-btn');
   
-  modelItems.forEach(item => {
-    item.style.cursor = 'pointer';
-    
-    item.addEventListener('click', () => {
-      // Remove active from all
-      modelItems.forEach(m => m.classList.remove('active'));
+  modelBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      modelBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
       
-      // Add active to this
-      item.classList.add('active');
+      selectedModel = btn.dataset.model;
+      console.log(`🤖 Modelo: ${selectedModel}`);
       
-      // Get model name
-      const modelName = item.querySelector('.model-name')?.textContent || 'Haiku';
-      selectedModel = modelName;
-      
-      console.log(`🤖 Selecionado: ${selectedModel}`);
-      
-      // Report to Mission Control
-      fetch('https://16.16.255.70:3000/api/task/thinking', {
+      // Report
+      fetch(`${SERVER_URL.replace('wss://', 'https://')}/api/task/thinking`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: `🤖 Model selecionado: ${selectedModel}` }),
+        body: JSON.stringify({ text: `🤖 Modelo selecionado: ${selectedModel}` }),
         credentials: 'omit'
       }).catch(() => {});
     });
   });
   
-  // Set Haiku as default active
-  modelItems[0]?.classList.add('active');
+  // Set Haiku as default
+  modelBtns[0]?.classList.add('active');
 }
 
-// Chat input handler
+// CHAT INPUT
 function setupChatInput() {
   const chatInput = document.getElementById('chatInput');
   const chatSend = document.getElementById('chatSend');
@@ -172,38 +159,34 @@ function setupChatInput() {
     if (!message) return;
     
     chatInput.value = '';
-    chatResponse.innerHTML = '<p>⏳ Processando com ' + selectedModel + '...</p>';
-    chatResponse.style.display = 'block';
+    chatResponse.textContent = `⏳ Enviando com ${selectedModel}...`;
     
     try {
-      // Iniciar tarefa com modelo selecionado
-      await fetch('https://16.16.255.70:3000/api/task/start', {
+      await fetch(`${SERVER_URL.replace('wss://', 'https://')}/api/task/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          taskName: `Chat [${selectedModel}]: ${message.substring(0, 30)}...`,
+          taskName: `[${selectedModel}] ${message.substring(0, 40)}...`,
           model: selectedModel
         }),
         credentials: 'omit'
       });
       
-      // Reportar mensagem
-      await fetch('https://16.16.255.70:3000/api/task/thinking', {
+      await fetch(`${SERVER_URL.replace('wss://', 'https://')}/api/task/thinking`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: `Yuri (${selectedModel}): ${message}` }),
         credentials: 'omit'
       });
       
-      chatResponse.innerHTML = '<p>✅ Mensagem enviada com ' + selectedModel + '!</p>';
+      chatResponse.textContent = `✅ Mensagem enviada!`;
       
       setTimeout(() => {
-        chatResponse.innerHTML += '<p>💭 Chimoco pensando...</p>';
-      }, 1500);
+        chatResponse.textContent = '';
+      }, 3000);
       
     } catch (err) {
-      console.error('Erro:', err);
-      chatResponse.innerHTML = `<p>⚠️ Enviado (sem resposta visual)</p>`;
+      chatResponse.textContent = `⚠️ Enviado (offline)`;
     }
   }
   
@@ -213,18 +196,16 @@ function setupChatInput() {
   });
 }
 
-// Iniciar quando a página carrega
+// INIT
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🚀 Iniciando Chimoco Mission Control');
+  console.log('🚀 Chimoco Mission Control v2');
   connectWebSocket();
   setupModelSelection();
   setupChatInput();
   
-  // Atualizar relógio a cada segundo
   setInterval(updateTimer, 1000);
 });
 
-// Reconectar se a página volta ao foco
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible' && (!ws || ws.readyState !== WebSocket.OPEN)) {
     connectWebSocket();
