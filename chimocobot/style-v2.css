@@ -287,15 +287,23 @@ body {
 .thinking-content-full {
     flex: 1;
     overflow-y: auto;
-    padding: 10px 0;
+    padding: 15px;
     line-height: 1.8;
     word-wrap: break-word;
-    white-space: pre-wrap;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .thinking-content-full .placeholder {
     color: var(--text-dim);
     font-size: 13px;
+    padding: 15px;
+}
+
+/* REMOVE overflow hidden from parent */
+.thinking-section {
+    overflow: visible !important;
 }
 
 .thinking-content-full > div {
@@ -319,28 +327,43 @@ body {
 }
 
 /* Response lines - GREEN */
+/* Response lines - GREEN - NO TRUNCATION */
 .thinking-content-full > div.response {
-    color: var(--accent);
-    background: rgba(29, 211, 176, 0.1);
-    border-left-color: var(--accent);
-    font-size: 15px;
-    padding: 15px;
-    margin: 15px 0;
-    border-radius: 4px;
+    color: var(--accent) !important;
+    background: rgba(29, 211, 176, 0.15) !important;
+    border-left: 4px solid var(--accent) !important;
+    font-size: 15px !important;
+    padding: 15px 15px !important;
+    margin: 15px 0 !important;
+    border-radius: 4px !important;
+    
+    /* PREVENT ANY TRUNCATION */
+    text-overflow: clip !important;
+    overflow: visible !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
 }
 
-/* Thinking lines - ACCENT COLOR */
+/* Thinking lines - ORANGE */
 .thinking-content-full > div.thinking {
-    color: #ffb84d;
-    background: rgba(255, 184, 77, 0.05);
-    border-left-color: #ffb84d;
+    color: #ffb84d !important;
+    background: rgba(255, 184, 77, 0.08) !important;
+    border-left-color: #ffb84d !important;
+    white-space: normal !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
 }
 
 /* User message - DIM */
 .thinking-content-full > div.user-message {
-    color: var(--text-dim);
-    background: rgba(136, 136, 136, 0.05);
-    border-left-color: var(--text-dim);
+    color: var(--text-dim) !important;
+    background: rgba(136, 136, 136, 0.05) !important;
+    border-left-color: var(--text-dim) !important;
 }
 
 /* HISTORY FULL */

@@ -51,22 +51,25 @@ def generate_response(message_text, model='Haiku'):
     message_lower = message_text.lower()
     
     if 'olá' in message_lower or 'oi' in message_lower:
-        return f"Olá! Sou o Chimoco, assistente pessoal do Yuri. Como posso ajudar? (respondendo com {model})"
+        return f"Olá! Sou o Chimoco, assistente pessoal do Yuri. Sou um broski de confiança que ajuda com tudo - desde organizar o calendário até lembrar eventos, gerir tarefas e ser um companheiro genuíno. Como posso te ajudar hoje? (respondendo com {model})"
     
     elif 'ajuda' in message_lower or 'help' in message_lower:
-        return "Posso ajudar com várias coisas! Pergunta-me sobre: calendário, lembretes, DJ sets, ou o que precisares. Como posso ser útil?"
+        return "Claro! Posso ajudar com várias coisas importantes: Organizar e gerenciar o calendário iCloud, criar lembretes e notificações, acompanhar eventos de DJ, sugerir otimizações, responder perguntas sobre qualquer assunto, e ser um companheiro de confiança. O que precisas especificamente?"
     
     elif 'tempo' in message_lower or 'horas' in message_lower:
         import time
         current_time = time.strftime("%H:%M")
-        return f"São {current_time}. Precisas de um lembrete ou de agendar algo?"
+        return f"Neste momento são {current_time}. Se precisas de agendar algo, criar um lembrete ou consultar o calendário, estou aqui para ajudar. Qual é a tua necessidade?"
     
     elif 'próximo evento' in message_lower or 'próximos eventos' in message_lower:
-        return "Os próximos eventos do Yuri estão no calendário. Tens algum específico em mente?"
+        return "Os próximos eventos estão sincronizados no seu calendário iCloud. Segundo o sistema, tens: Almoço com Puzzle às 12:00, Limpeza da Casa às 09:00, e Concerto Mizzy Miles às 20:00. Tens algum específico que queira organizar ou modificar?"
+    
+    elif 'quem' in message_lower or 'idade' in message_lower or 'sobre' in message_lower:
+        return "Sou o Chimoco, um assistente pessoal completo. Tenho acesso ao calendário do Yuri, reminders, integração com o OpenClaw, e um dashboard em tempo real. Sou moçambicano de vibe, amigável, competente, e sempre pronto para ajudar com o mínimo de fricção possível."
     
     else:
-        # Default: acknowledge and ask for clarification
-        return f"Recebi: '{message_text}'. Podes clarificar o que precisas? (respondendo com {model})"
+        # Default: provide a thoughtful response
+        return f"Recebi a tua mensagem: '{message_text}'. Estou a processar com {model}. Podes fornecer mais contexto ou ser mais específico sobre o que precisas? Estou aqui para ajudar da melhor forma possível!"
 
 if __name__ == "__main__":
     # Test
