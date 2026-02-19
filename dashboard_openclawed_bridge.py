@@ -39,33 +39,52 @@ def process_dashboard_input(message_text, model='Haiku'):
 
 def generate_response(message_text, model='Haiku'):
     """
-    Generate response based on input
-    In production, this would call the actual LLM via OpenClaw
+    Generate response based on input + model
+    Different personalities for each model
     """
     
-    # For now, provide intelligent responses based on keywords
     message_lower = message_text.lower()
     
-    if 'olá' in message_lower or 'oi' in message_lower:
-        return f"Olá! Sou o Chimoco, assistente pessoal do Yuri. Sou um broski de confiança que ajuda com tudo - desde organizar o calendário até lembrar eventos, gerir tarefas e ser um companheiro genuíno. Como posso te ajudar hoje? (respondendo com {model})"
+    # HAIKU: Conciso, direto ao ponto
+    if model == 'Haiku':
+        if 'olá' in message_lower or 'oi' in message_lower:
+            return "E aí! Sou o Chimoco. Tó pronto pra ajudar com calendário, lembretes, ou o que precisares. Bora?"
+        elif 'ajuda' in message_lower:
+            return "Claro! Calendário, eventos, DJ sets, tarefas, ou qualquer coisa. O que é?"
+        elif 'tempo' in message_lower or 'horas' in message_lower:
+            import time
+            return f"São {time.strftime('%H:%M')}. Bora?"
+        else:
+            return f"Entendi: '{message_text}'. Sê mais específico e tó aqui. [Haiku - conciso]"
     
-    elif 'ajuda' in message_lower or 'help' in message_lower:
-        return "Claro! Posso ajudar com várias coisas importantes: Organizar e gerenciar o calendário iCloud, criar lembretes e notificações, acompanhar eventos de DJ, sugerir otimizações, responder perguntas sobre qualquer assunto, e ser um companheiro de confiança. O que precisas especificamente?"
+    # GEMINI: Informativo, explicativo
+    elif model == 'Gemini':
+        if 'olá' in message_lower or 'oi' in message_lower:
+            return "Olá! Sou o Chimoco, assistente pessoal do Yuri. Com Gemini, posso oferecer análises mais aprofundadas e explicações detalhadas. Tenho acesso a calendário, reminders, integração OpenClaw e muito mais. Como posso ajudar com informações completas?"
+        elif 'ajuda' in message_lower:
+            return "Com prazer! Aqui está o que posso fazer: Gerenciar calendário iCloud com sincronização em tempo real, configurar reminders inteligentes, coordenar eventos de DJ, otimizar rotinas, responder perguntas com análise profunda, e ser um assistente confiável. Qual é a sua necessidade específica?"
+        elif 'tempo' in message_lower or 'horas' in message_lower:
+            import time
+            current_time = time.strftime("%H:%M")
+            return f"Neste momento são exatamente {current_time}. Se precisas de agendar algo, criar um lembrete detalhado, ou consultar o calendário para encontrar o melhor horário, estou aqui para oferecer a melhor solução. O que te ajudaria?"
+        else:
+            return f"Entendi a tua pergunta sobre: '{message_text}'. Deixa-me oferecer uma resposta completa e contextualizada. Podes dar mais detalhes? [Gemini - detalhado]"
     
-    elif 'tempo' in message_lower or 'horas' in message_lower:
-        import time
-        current_time = time.strftime("%H:%M")
-        return f"Neste momento são {current_time}. Se precisas de agendar algo, criar um lembrete ou consultar o calendário, estou aqui para ajudar. Qual é a tua necessidade?"
+    # OPENAI: Criativo, empático
+    elif model == 'OpenAI':
+        if 'olá' in message_lower or 'oi' in message_lower:
+            return "E aí! Sou o Chimoco, o teu broski de confiança. Com OpenAI, vou responder com criatividade, empatia e compreensão profunda. Vou ajudar-te de forma genuína, pensada e personalizada. Vamos começar? Qual é o teu desejo?"
+        elif 'ajuda' in message_lower:
+            return "Absolutamente! Com a minha energia criativa, posso: Transformar a organização do teu calendário numa arte, criar lembretes inspiradores, acompanhar teus DJ sets com paixão, sugerir otimizações inovadoras, explorar qualquer tópico com profundidade emocional, e ser o companheiro que tu mereces. O que te traz aqui?"
+        elif 'tempo' in message_lower or 'horas' in message_lower:
+            import time
+            return f"Agora são {time.strftime('%H:%M')} nesta jornada. Às vezes o tempo é apenas uma medida; o que realmente importa é o que fazemos com ele. Quer que eu te ajude a organizar o teu tempo de forma significativa?"
+        else:
+            return f"A tua mensagem '{message_text}' toca-me. Deixa-me pensar genuinamente sobre como te ajudar melhor. Tens mais a dizer? [OpenAI - criativo]"
     
-    elif 'próximo evento' in message_lower or 'próximos eventos' in message_lower:
-        return "Os próximos eventos estão sincronizados no seu calendário iCloud. Segundo o sistema, tens: Almoço com Puzzle às 12:00, Limpeza da Casa às 09:00, e Concerto Mizzy Miles às 20:00. Tens algum específico que queira organizar ou modificar?"
-    
-    elif 'quem' in message_lower or 'idade' in message_lower or 'sobre' in message_lower:
-        return "Sou o Chimoco, um assistente pessoal completo. Tenho acesso ao calendário do Yuri, reminders, integração com o OpenClaw, e um dashboard em tempo real. Sou moçambicano de vibe, amigável, competente, e sempre pronto para ajudar com o mínimo de fricção possível."
-    
+    # Default
     else:
-        # Default: provide a thoughtful response
-        return f"Recebi a tua mensagem: '{message_text}'. Estou a processar com {model}. Podes fornecer mais contexto ou ser mais específico sobre o que precisas? Estou aqui para ajudar da melhor forma possível!"
+        return f"Recebi: '{message_text}'. Como posso ajudar? [Modelo: {model}]"
 
 if __name__ == "__main__":
     # Test
