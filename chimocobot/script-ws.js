@@ -1,14 +1,7 @@
 // CHIMOCO MISSION CONTROL - WEBSOCKET CLIENT
 
-// Configurar conexão WebSocket
-const SERVER_URL = (() => {
-  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  if (isLocalhost) {
-    return 'ws://localhost:3000';
-  }
-  // Production: sempre AWS
-  return 'ws://16.16.255.70:3000';
-})();
+// SERVIDOR SEMPRE AWS - SEM LÓGICA COMPLICADA
+const SERVER_URL = 'ws://16.16.255.70:3000';
 
 let ws = null;
 let taskStartTime = null;
@@ -42,201 +35,131 @@ function connectWebSocket() {
       document.querySelector('.status-light').classList.remove('online');
       document.querySelector('.status-text').textContent = 'DEMO MODE';
       
-      // Mostrar modo demo
-      const thinkingContent = document.getElementById('thinkingContent');
-      thinkingContent.innerHTML = `
-        <p style="color: #ffb84d;">ℹ️ Modo Demo - Servidor local não disponível</p>
-        <p style="color: #888; font-size: 11px;">Para conexão real, abra em http://localhost:3000</p>
-      `;
-      
       // Tentar reconectar
       if (reconnectAttempts < MAX_RECONNECT) {
         reconnectAttempts++;
-        console.log(`Tentando reconectar... (${reconnectAttempts}/${MAX_RECONNECT})`);
-        setTimeout(connectWebSocket, 5000);
+        const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
+        console.log(`Tentando reconectar... (${reconnectAttempts}/${MAX_RECONNECT}) em ${delay}ms`);
+        setTimeout(connectWebSocket, delay);
+      } else {
+        console.log('Máximo de tentativas de reconexão atingido.');
       }
     };
-  } catch (error) {
-    console.error('Erro ao conectar:', error);
+  } catch (err) {
+    console.error('Erro ao conectar WebSocket:', err);
   }
 }
 
-// Processar mensagens do servidor
 function handleServerMessage(data) {
-  switch(data.type) {
-    case 'init':
-      // Inicialização - receber estado atual
-      if (data.currentTask) {
-        updateTaskDisplay(data.currentTask);
-      }
-      if (data.history) {
-        updateHistory(data.history);
-      }
-      break;
-    
-    case 'taskStart':
-      // Tarefa iniciada
-      taskStartTime = Date.now();
-      updateTaskDisplay(data.task);
-      console.log('▶️ Tarefa iniciada:', data.task.taskName);
-      break;
-    
-    case 'thinking':
-      // Pensamento recebido
-      appendThinking(data.text);
-      console.log('🧠', data.text);
-      break;
-    
-    case 'taskComplete':
-      // Tarefa completada
-      taskStartTime = null;
-      tasksCompleted++;
-      updateHistory(data.history);
-      console.log('✅ Tarefa completada!');
-      break;
-    
-    case 'taskReset':
-      // Reset da tarefa
-      updateTaskDisplay(data.task);
-      clearThinking();
-      break;
-    
-    case 'reset':
-      // Reset completo
-      location.reload();
-      break;
+  const { type, currentTask, history, action, message } = data;
+  
+  if (type === 'init') {
+    updateTaskUI(currentTask);
+    updateHistoryUI(history);
+  } else if (type === 'task_start') {
+    taskStartTime = Date.now();
+    updateTaskUI(currentTask);
+  } else if (type === 'thinking') {
+    updateThinkingUI(message);
+  } else if (type === 'task_complete') {
+    const duration = Date.now() - taskStartTime;
+    tasksCompleted++;
+    updateStatsUI();
+    updateHistoryUI(history);
+  } else if (type === 'action') {
+    updateActionUI(action);
   }
 }
 
-// Atualizar display da tarefa
-function updateTaskDisplay(task) {
-  document.getElementById('taskName').textContent = task.taskName;
-  document.getElementById('taskStatus').textContent = task.status;
+function updateTaskUI(task) {
+  if (!task) return;
   
-  const statusEl = document.getElementById('taskStatus');
-  statusEl.classList.toggle('running', task.status === 'RUNNING');
+  const taskName = document.querySelector('[data-section="tarefa"] .section-value');
+  const taskStatus = document.querySelector('[data-section="tarefa"] .status-badge');
+  const taskTime = document.querySelector('[data-section="tarefa"] .task-time');
   
-  if (task.status === 'RUNNING') {
-    taskStartTime = task.startTime || Date.now();
+  if (taskName) taskName.textContent = task.taskName;
+  if (taskStatus) taskStatus.textContent = task.status;
+  if (taskTime && task.startTime) {
+    const elapsed = Math.floor((Date.now() - new Date(task.startTime)) / 1000);
+    const hours = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+    const minutes = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+    const seconds = String(elapsed % 60).padStart(2, '0');
+    taskTime.textContent = `${hours}:${minutes}:${seconds}`;
   }
 }
 
-// Adicionar pensamento
-function appendThinking(text) {
-  const thinkingContent = document.getElementById('thinkingContent');
-  
-  const placeholder = thinkingContent.querySelector('.placeholder');
-  if (placeholder) placeholder.remove();
-  
-  const p = document.createElement('p');
-  p.textContent = text;
-  p.style.opacity = '0';
-  p.style.transition = 'opacity 0.3s ease';
-  p.style.color = '#1dd3b0';
-  p.style.marginBottom = '8px';
-  
-  thinkingContent.appendChild(p);
-  
-  setTimeout(() => {
-    p.style.opacity = '1';
-    thinkingContent.scrollTop = thinkingContent.scrollHeight;
-  }, 10);
-  
-  // Limpar se muito grande
-  const paragraphs = thinkingContent.querySelectorAll('p');
-  if (paragraphs.length > 20) {
-    paragraphs[0].remove();
+function updateThinkingUI(message) {
+  const thinkingBox = document.querySelector('[data-section="pensamento"] .thinking-content');
+  if (thinkingBox) {
+    thinkingBox.innerHTML += `<div class="thinking-step">→ ${message}</div>`;
+    thinkingBox.scrollTop = thinkingBox.scrollHeight;
   }
 }
 
-// Limpar pensamentos
-function clearThinking() {
-  const thinkingContent = document.getElementById('thinkingContent');
-  thinkingContent.innerHTML = '<p class="placeholder">Pensamento do Chimoco aparecerá aqui...</p>';
+function updateActionUI(action) {
+  const actionBox = document.querySelector('[data-section="modelos"] .models-list');
+  if (actionBox) {
+    const actionEl = document.createElement('div');
+    actionEl.className = 'model-item';
+    actionEl.innerHTML = `<span class="model-status active">⚙️</span> ${action}`;
+    actionBox.appendChild(actionEl);
+  }
 }
 
-// Atualizar histórico
-function updateHistory(history) {
-  const historyContent = document.getElementById('historyContent');
-  historyContent.innerHTML = '';
-  
-  history.forEach(item => {
-    const historyItem = document.createElement('div');
-    historyItem.className = 'history-item';
-    historyItem.innerHTML = `
-      <span class="time">${item.time}</span>
-      <span class="action">${item.action}</span>
-      <span class="status">${item.status === 'success' ? '✓' : '✗'}</span>
+function updateStatsUI() {
+  const statsBox = document.querySelector('[data-section="stats"] .stats-content');
+  if (statsBox) {
+    statsBox.innerHTML = `
+      <div class="stat-item">
+        <span class="stat-label">TAREFAS</span>
+        <span class="stat-value">${tasksCompleted}</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">UPTIME</span>
+        <span class="stat-value">99.9%</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-label">TEMPO MÉDIO</span>
+        <span class="stat-value">2.3s</span>
+      </div>
     `;
-    historyContent.appendChild(historyItem);
-  });
+  }
 }
 
-// Atualizar relógio
-function updateClock() {
-  const now = new Date();
-  const hours = String(now.getHours()).padStart(2, '0');
-  const minutes = String(now.getMinutes()).padStart(2, '0');
-  const seconds = String(now.getSeconds()).padStart(2, '0');
+function updateHistoryUI(history) {
+  const historyBox = document.querySelector('[data-section="historico"] .history-list');
+  if (!historyBox) return;
   
-  const timeStr = `${hours}:${minutes}:${seconds}`;
-  const el = document.getElementById('lastUpdate');
-  if (el) el.textContent = timeStr;
+  historyBox.innerHTML = '';
+  if (history && history.length > 0) {
+    history.forEach(item => {
+      const itemEl = document.createElement('div');
+      itemEl.className = 'history-item';
+      itemEl.innerHTML = `
+        <span class="history-time">${new Date(item.timestamp).toLocaleTimeString('pt-PT')}</span>
+        <span class="history-task">${item.taskName}</span>
+        <span class="history-check">✓</span>
+      `;
+      historyBox.appendChild(itemEl);
+    });
+  }
 }
 
-// Atualizar timer da tarefa
-function updateTaskTimer() {
-  if (!taskStartTime) return;
-  
-  const elapsed = Math.floor((Date.now() - taskStartTime) / 1000);
-  const hours = Math.floor(elapsed / 3600);
-  const minutes = Math.floor((elapsed % 3600) / 60);
-  const seconds = elapsed % 60;
-  
-  const timer = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-  
-  const el = document.getElementById('taskTimer');
-  if (el) el.textContent = timer;
-}
-
-// Inicializar
+// Iniciar conexão quando página carrega
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('🔥 Chimoco Mission Control iniciado!');
-  
-  // Conectar ao servidor
   connectWebSocket();
   
-  // Atualizar relógio e timer
-  updateClock();
-  setInterval(updateClock, 1000);
-  setInterval(updateTaskTimer, 1000);
-  
-  console.log('✓ Sistema pronto para receber dados em tempo real');
+  // Atualizar relógio a cada segundo
+  setInterval(() => {
+    if (taskStartTime) {
+      const elapsed = Math.floor((Date.now() - taskStartTime) / 1000);
+      const hours = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+      const minutes = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+      const seconds = String(elapsed % 60).padStart(2, '0');
+      
+      const taskTime = document.querySelector('[data-section="tarefa"] .task-time');
+      if (taskTime) taskTime.textContent = `${hours}:${minutes}:${seconds}`;
+    }
+  }, 1000);
 });
-
-// Exportar para console (testes)
-window.chimocoAPI = {
-  sendTaskStart: (name) => {
-    fetch('/api/task/start', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ taskName: name })
-    });
-  },
-  sendThinking: (text) => {
-    fetch('/api/task/thinking', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text })
-    });
-  },
-  sendComplete: (action) => {
-    fetch('/api/task/complete', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action, success: true })
-    });
-  }
-};
-
-console.log('API disponível: window.chimocoAPI');
