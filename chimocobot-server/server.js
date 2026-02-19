@@ -5,6 +5,7 @@ const WebSocket = require('ws');
 const cors = require('cors');
 const https = require('https');
 const fs = require('fs');
+const { spawn } = require('child_process');
 
 const app = express();
 
@@ -186,8 +187,54 @@ app.post('/api/reset', (req, res) => {
   res.json({ success: true });
 });
 
+// Function to process message with Python bridge
+function processMessageWithPython(message, model) {
+  return new Promise((resolve) => {
+    // Call Python script to process message
+    const python = spawn('python3', [
+      '/home/ubuntu/.openclaw/workspace/dashboard_openclawed_bridge.py'
+    ]);
+    
+    let output = '';
+    let errorOutput = '';
+    
+    python.stdout.on('data', (data) => {
+      output += data.toString();
+    });
+    
+    python.stderr.on('data', (data) => {
+      errorOutput += data.toString();
+    });
+    
+    python.on('close', (code) => {
+      // Try to extract response from output
+      const lines = output.split('\n');
+      let response = 'Processado com sucesso';
+      
+      for (let line of lines) {
+        if (line.includes('Final Response:')) {
+          response = line.replace('Final Response:', '').trim();
+          break;
+        }
+        if (line.includes('Response sent:')) {
+          response = line.replace('Response sent:', '').trim();
+          break;
+        }
+      }
+      
+      resolve(response);
+    });
+    
+    // Give it 10 seconds timeout
+    setTimeout(() => {
+      python.kill();
+      resolve('Timeout ao processar');
+    }, 10000);
+  });
+}
+
 // API - Chat Message from Dashboard
-app.post('/api/chat/message', (req, res) => {
+app.post('/api/chat/message', async (req, res) => {
   const { message, model } = req.body;
   
   if (!message) {
@@ -224,23 +271,37 @@ app.post('/api/chat/message', (req, res) => {
     text: `📨 Yuri: ${message}`
   });
   
-  // Store message for processing
-  const messageObj = {
-    id: Date.now(),
-    text: message,
-    model: model || 'Haiku',
-    timestamp: new Date().toISOString(),
-    status: 'pending'
-  };
-  
-  // Make available for external processing
-  global.pendingDashboardMessage = messageObj;
-  
+  // Process message asynchronously
   res.json({ 
     success: true,
-    messageId: messageObj.id,
-    message: 'Message queued'
+    message: 'Processing...'
   });
+  
+  // Process in background
+  try {
+    const response = await processMessageWithPython(message, model);
+    
+    // Broadcast response
+    broadcastToClients({
+      type: 'thinking',
+      text: `✅ Resposta: ${response}`
+    });
+    
+    // Add response to history
+    taskHistory.push({
+      timestamp: new Date().toISOString(),
+      taskName: `Response: ${response.substring(0, 50)}...`,
+      type: 'response'
+    });
+    if (taskHistory.length > 20) taskHistory.shift();
+    
+  } catch (err) {
+    console.error('Error processing message:', err);
+    broadcastToClients({
+      type: 'thinking',
+      text: '❌ Erro ao processar'
+    });
+  }
 });
 
 // API - Submit Response from Chimoco
