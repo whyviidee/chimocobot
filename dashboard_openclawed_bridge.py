@@ -2,6 +2,7 @@
 """
 DASHBOARD OPENCLAW BRIDGE
 Processes dashboard messages through the real OpenClaw system
+Uses smart response generation based on actual message content
 """
 
 import sys
@@ -38,12 +39,18 @@ def process_dashboard_input(message_text, model='Haiku'):
         print(f"❌ Error: {e}")
         return None
 
-# Note: Using smart_response_generator.generate_smart_response() instead
-
 if __name__ == "__main__":
     # Test
-    test_message = "Olá!"
-    test_model = "Haiku"
+    test_messages = [
+        ("Olá!", "Haiku"),
+        ("Olá!", "Gemini"),
+        ("Olá!", "OpenAI"),
+        ("Como me ajudas?", "Haiku"),
+        ("Como me ajudas?", "Gemini"),
+    ]
     
-    response = process_dashboard_input(test_message, test_model)
-    print(f"\n📤 Final Response: {response}")
+    for msg, model in test_messages:
+        print(f"\n{'='*50}")
+        print(f"Testing: {msg} with {model}")
+        print('='*50)
+        result = process_dashboard_input(msg, model)
