@@ -83,15 +83,15 @@ function addThinkingLine(text) {
   if (placeholder) placeholder.remove();
   
   const line = document.createElement('div');
-  line.textContent = '→ ' + text;
+  line.textContent = text;
   thinkingContent.appendChild(line);
   
   thinkingLines++;
-  const counter = document.getElementById('thinkingCount');
-  if (counter) counter.textContent = thinkingLines + ' linhas';
   
   // Auto-scroll
-  thinkingContent.scrollTop = thinkingContent.scrollHeight;
+  setTimeout(() => {
+    thinkingContent.scrollTop = thinkingContent.scrollHeight;
+  }, 10);
 }
 
 function updateHistoryUI(history) {
@@ -196,12 +196,31 @@ function setupChatInput() {
   });
 }
 
+// TABS
+function setupTabs() {
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+  
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tabId = btn.dataset.tab;
+      
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabContents.forEach(c => c.classList.remove('active'));
+      
+      btn.classList.add('active');
+      document.getElementById(tabId + '-tab')?.classList.add('active');
+    });
+  });
+}
+
 // INIT
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🚀 Chimoco Mission Control v2');
   connectWebSocket();
   setupModelSelection();
   setupChatInput();
+  setupTabs();
   
   setInterval(updateTimer, 1000);
 });

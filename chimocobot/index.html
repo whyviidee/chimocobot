@@ -76,21 +76,22 @@
 
             <!-- MAIN CONTENT -->
             <main class="content">
-                <!-- PENSAMENTO EM TEMPO REAL -->
-                <section class="thinking-section">
-                    <div class="thinking-header">
-                        <h2>💭 PENSAMENTO EM TEMPO REAL</h2>
-                        <span class="thinking-count" id="thinkingCount">0 linhas</span>
-                    </div>
-                    <div id="thinkingContent" class="thinking-content">
+                <!-- TABS -->
+                <div class="tabs-header">
+                    <button class="tab-btn active" data-tab="thinking">💭 PENSAMENTO</button>
+                    <button class="tab-btn" data-tab="history">📜 HISTÓRICO</button>
+                </div>
+
+                <!-- PENSAMENTO EM TEMPO REAL - FULL SCREEN -->
+                <section id="thinking-tab" class="tab-content active">
+                    <div id="thinkingContent" class="thinking-content-full">
                         <div class="placeholder">Esperando pensamentos...</div>
                     </div>
                 </section>
 
-                <!-- HISTÓRICO -->
-                <section class="history-section">
-                    <h2>📜 HISTÓRICO (ÚLTIMAS 5)</h2>
-                    <div id="historyList" class="history-list">
+                <!-- HISTÓRICO - TAB -->
+                <section id="history-tab" class="tab-content">
+                    <div id="historyList" class="history-list-full">
                         <div class="history-item">Aguardando ações...</div>
                     </div>
                 </section>
