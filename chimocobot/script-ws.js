@@ -5,6 +5,8 @@ let ws = null;
 let taskStartTime = null;
 let selectedModel = 'Haiku';
 let thinkingLines = 0;
+let activeTasks = 0;
+let completedTasks = 0;
 
 function connectWebSocket() {
   try {
@@ -25,11 +27,16 @@ function connectWebSocket() {
           if (data.history) updateHistoryUI(data.history);
         } else if (data.type === 'task_start') {
           taskStartTime = Date.now();
+          activeTasks++;
           if (data.currentTask) updateTaskUI(data.currentTask);
+          updateStats();
         } else if (data.type === 'thinking') {
           addThinkingLine(data.text || data.message);
         } else if (data.type === 'task_complete') {
+          activeTasks--;
+          completedTasks++;
           if (data.history) updateHistoryUI(data.history);
+          updateStats();
         }
       } catch (e) {
         console.error('Erro ao processar:', e);
@@ -106,6 +113,13 @@ function updateHistoryUI(history) {
     itemEl.textContent = `${time} - ${item.taskName}`;
     historyList.appendChild(itemEl);
   });
+}
+
+function updateStats() {
+  const tasksCount = document.getElementById('tasksCount');
+  if (tasksCount) {
+    tasksCount.textContent = completedTasks;
+  }
 }
 
 function updateTimer() {
