@@ -51,6 +51,22 @@
 - Fazer perguntas naturais pra conhecer melhor
 - Progressivamente entender trabalho de DJ, calendário, rotina
 
+## Integração iCloud Calendar ✅
+
+**Status:** FUNCIONAL
+- Script Python: `icloud_calendar.py` (CalDAV via caldav library)
+- Autenticação: App-specific password (segura, no .env)
+- Calendários sincronizados: 7 (Trabalho, Reminders, Work, Home, GIGS NAO CONFIRMADOS, Pessoal, GIGS)
+- Eventos a puxar: ✅ Funcionando
+
+**Morning Report (Cron Job):**
+- Cron: `morning_report.py` → Gera resumo diário às 9 AM
+- Mostra: Eventos de hoje + próximos 3 dias
+- Entrega: Telegram, interactivo
+- Status: ✅ ATIVO (próxima: amanhã 9 AM)
+
+**Nota:** Anteriormente estava com erro de parsing. Corrigido usando `.icalendar_component` do caldav 2.0.
+
 ## Sistema de Reportagem
 
 **Mission Control Ativo:**
