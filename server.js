@@ -7,7 +7,11 @@ const http = require('http');
 
 const app = express();
 const server = http.createServer(app);
-const wss = new WebSocket.Server({ server });
+const wss = new WebSocket.Server({ 
+  server,
+  perMessageDeflate: false,
+  clientTracking: true
+});
 const path = require('path');
 
 const PORT = process.env.PORT || 3000;
