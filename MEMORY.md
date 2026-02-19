@@ -67,18 +67,36 @@
 
 **Nota:** Anteriormente estava com erro de parsing. Corrigido usando `.icalendar_component` do caldav 2.0.
 
-## Mission Control - SETUP COMPLETO ✅
+## Mission Control - FULLY OPERATIONAL 🚀
 
-**Componentes:**
-- ✅ Dashboard: https://chimocobot.vercel.app/ (Vercel)
-- ✅ Servidor: 16.16.255.70:3000 (AWS)
-- ✅ Port 3000: Aberta no Security Group (launch-wizard-1)
-- ✅ GitHub: Secrets removidos, SSH configurado
-- ✅ Git SSH: Configurado globalmente (user: ydagot@gmail.com)
+**Architecture:**
+- ✅ Dashboard: https://chimocobot.vercel.app/ (Vercel, split-screen layout)
+- ✅ Server: 16.16.255.70:3000 (AWS Node.js + WebSocket)
+- ✅ SSL/TLS: Self-signed certificate on AWS
+- ✅ Port 3000: Open in Security Group
+- ✅ GitHub: Secrets removed, SSH configured
+- ✅ Auto-reporting: Integrated with OpenClaw responses
 
-**Se WebSocket falhar:**
-- Hard refresh (Ctrl+Shift+R) no browser
-- Restart server: `pkill -f 'node server.js' && cd /home/ubuntu/.openclaw/workspace/chimocobot-server && npm start &`
+**How It Works:**
+1. Yuri sends message in Dashboard input
+2. Server receives and notifies
+3. Chimoco sees message here in chat
+4. Processes naturally and responds
+5. Response automatically reported to Dashboard
+6. Dashboard shows message + response in real-time
+
+**Dashboard Features:**
+- ✅ Split-screen: Sidebar (tasks/models/stats) + Main (chat stream)
+- ✅ Model selection: Haiku/Gemini/OpenAI (each with personality)
+- ✅ Real-time updates via WebSocket
+- ✅ Chat input field
+- ✅ Response formatting: Green for final answers
+- ✅ Stats counter: Updates on task completion
+- ✅ History tab: Last 5 interactions
+
+**If Issues:**
+- Hard refresh: Ctrl+Shift+R (clear cache)
+- Restart server: `pkill -9 node && cd /home/ubuntu/.openclaw/workspace/chimocobot-server && npm start &`
 - Check logs: `tail -f /tmp/chimocobot.log`
 
 ## Sistema de Reportagem
