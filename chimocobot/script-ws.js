@@ -91,6 +91,21 @@ function addThinkingLine(text) {
   
   const line = document.createElement('div');
   line.textContent = text;
+  
+  // Categorize message type
+  if (text.includes('📨') || text.includes('Yuri:')) {
+    line.className = 'user-message';
+  } else if (text.includes('📤') || text.includes('✅ Resposta:') || text.includes('Resposta:')) {
+    line.className = 'response';
+  } else if (text.includes('💭') || text.includes('Processando') || text.includes('pensamento')) {
+    line.className = 'thinking';
+  }
+  
+  // Prevent wrapping with ellipsis
+  line.style.wordWrap = 'break-word';
+  line.style.whiteSpace = 'normal';
+  line.style.maxWidth = '100%';
+  
   thinkingContent.appendChild(line);
   
   thinkingLines++;

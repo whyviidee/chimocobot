@@ -30,10 +30,10 @@ def process_dashboard_input(message_text, model='Haiku'):
         # Step 3: Generate response (simulated - in real setup would call LLM)
         response = generate_response(message_text, model)
         
-        # Step 4: Report response back
-        report_response(response, model=model)
+        # Step 4: Report response back (with GREEN marker)
+        report_response(f"✅ Resposta: {response}", model=model)
         
-        print(f"✅ Response sent: {response[:50]}...")
+        print(f"✅ Response sent: {response}")
         return response
         
     except Exception as e:
