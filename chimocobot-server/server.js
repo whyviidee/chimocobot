@@ -3,10 +3,18 @@
 const express = require('express');
 const WebSocket = require('ws');
 const cors = require('cors');
-const http = require('http');
+const https = require('https');
+const fs = require('fs');
 
 const app = express();
-const server = http.createServer(app);
+
+// Load SSL certificates
+const options = {
+  key: fs.readFileSync('/tmp/key.pem'),
+  cert: fs.readFileSync('/tmp/cert.pem')
+};
+
+const server = https.createServer(options, app);
 const wss = new WebSocket.Server({ 
   server,
   perMessageDeflate: false,
@@ -184,13 +192,13 @@ app.get('/health', (req, res) => {
 });
 
 // Iniciar servidor
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`
 ╔══════════════════════════════════════╗
 ║  🔥 CHIMOCO MISSION CONTROL SERVER  ║
 ║  Porta: ${PORT}                        
-║  WebSocket: ws://localhost:${PORT}    
-║  API: http://localhost:${PORT}/api     
+║  WebSocket: ws://16.16.255.70:${PORT} 
+║  API: http://16.16.255.70:${PORT}/api 
 ╚══════════════════════════════════════╝
   `);
 });
