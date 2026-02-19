@@ -186,6 +186,41 @@ app.post('/api/reset', (req, res) => {
   res.json({ success: true });
 });
 
+// API - Chat Message
+app.post('/api/chat/message', (req, res) => {
+  const { message, model } = req.body;
+  
+  if (!message) {
+    return res.status(400).json({ error: 'Message required' });
+  }
+  
+  // Start task
+  currentTask = {
+    taskName: `[${model || 'Haiku'}] ${message.substring(0, 40)}...`,
+    status: 'RUNNING',
+    thinking: [],
+    startTime: Date.now(),
+    model: model || 'Haiku'
+  };
+  
+  // Broadcast to clients
+  broadcastToClients({
+    type: 'task_start',
+    currentTask: currentTask
+  });
+  
+  // Report message received
+  broadcastToClients({
+    type: 'thinking',
+    text: `📨 Yuri: ${message}`
+  });
+  
+  res.json({ 
+    success: true,
+    message: 'Processing...'
+  });
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date() });

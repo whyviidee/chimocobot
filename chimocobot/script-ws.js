@@ -176,31 +176,34 @@ function setupChatInput() {
     chatResponse.textContent = `⏳ Enviando com ${selectedModel}...`;
     
     try {
-      await fetch(`${SERVER_URL.replace('wss://', 'https://')}/api/task/start`, {
+      // Send to Mission Control server
+      const res = await fetch(`${SERVER_URL.replace('wss://', 'https://')}/api/chat/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          taskName: `[${selectedModel}] ${message.substring(0, 40)}...`,
+          message: message,
           model: selectedModel
         }),
         credentials: 'omit'
       });
       
-      await fetch(`${SERVER_URL.replace('wss://', 'https://')}/api/task/thinking`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: `Yuri (${selectedModel}): ${message}` }),
-        credentials: 'omit'
-      });
+      if (!res.ok) throw new Error('Server error');
       
-      chatResponse.textContent = `✅ Mensagem enviada!`;
+      const data = await res.json();
+      
+      chatResponse.textContent = `✅ Mensagem enviada! Chimoco está a processar...`;
       
       setTimeout(() => {
         chatResponse.textContent = '';
       }, 3000);
       
     } catch (err) {
-      chatResponse.textContent = `⚠️ Enviado (offline)`;
+      console.error('Error:', err);
+      chatResponse.textContent = `⚠️ Erro ao enviar`;
+      
+      setTimeout(() => {
+        chatResponse.textContent = '';
+      }, 3000);
     }
   }
   
