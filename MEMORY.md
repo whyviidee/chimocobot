@@ -67,23 +67,19 @@
 
 **Nota:** Anteriormente estava com erro de parsing. Corrigido usando `.icalendar_component` do caldav 2.0.
 
-## Mission Control - OPERACIONAL 🔥
+## Mission Control - SETUP COMPLETO ✅
 
 **Componentes:**
-- ✅ **Dashboard:** https://chimocobot.vercel.app/ (Vercel)
-- ✅ **Servidor Node.js:** 16.16.255.70:3000 (AWS)
-- ✅ **WebSocket:** Conectado (ws://16.16.255.70:3000)
-- ✅ **Auto-reporting:** Ativado
+- ✅ Dashboard: https://chimocobot.vercel.app/ (Vercel)
+- ✅ Servidor: 16.16.255.70:3000 (AWS)
+- ✅ Port 3000: Aberta no Security Group (launch-wizard-1)
+- ✅ GitHub: Secrets removidos, SSH configurado
+- ✅ Git SSH: Configurado globalmente (user: ydagot@gmail.com)
 
-**Status Atual:**
-- Servidor rodando (PID 14810)
-- Dashboard a conectar ao servidor
-- Dados em tempo real transmitidos via WebSocket
-- Histórico e métricas atualizados
-
-**Próximos passos:**
-- Monitore a conexão WebSocket
-- Se cair, restart: `cd /home/ubuntu/.openclaw/workspace/chimocobot-server && npm start &`
+**Se WebSocket falhar:**
+- Hard refresh (Ctrl+Shift+R) no browser
+- Restart server: `pkill -f 'node server.js' && cd /home/ubuntu/.openclaw/workspace/chimocobot-server && npm start &`
+- Check logs: `tail -f /tmp/chimocobot.log`
 
 ## Sistema de Reportagem
 
