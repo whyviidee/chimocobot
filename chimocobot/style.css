@@ -519,3 +519,70 @@ body {
     overflow-y: auto;
 }
 
+
+/* FIX: MELHOR LAYOUT E TEXTOS */
+
+.panel {
+    overflow: visible !important;
+}
+
+.thinking-content {
+    word-wrap: break-word !important;
+    white-space: pre-wrap !important;
+    max-width: 100% !important;
+}
+
+.history-item {
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+}
+
+/* MODELS - CLICKABLE */
+.model-item {
+    cursor: pointer !important;
+    transition: all 0.3s !important;
+    border: 2px solid transparent !important;
+}
+
+.model-item:hover {
+    border-color: #ff6b35 !important;
+    transform: scale(1.05) !important;
+    box-shadow: 0 0 15px rgba(255, 107, 53, 0.4) !important;
+}
+
+.model-item.active {
+    border-color: #1dd3b0 !important;
+    background: rgba(29, 211, 176, 0.1) !important;
+    box-shadow: 0 0 20px rgba(29, 211, 176, 0.3) !important;
+}
+
+.model-name {
+    font-weight: bold !important;
+}
+
+/* CHAT INPUT AREA - MELHOR */
+.chat-section {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: linear-gradient(135deg, #050a1a 0%, #0a0e27 100%) !important;
+    border-top: 2px solid #ff6b35 !important;
+    padding: 20px !important;
+    z-index: 1000 !important;
+}
+
+.chat-input-container {
+    max-width: 900px !important;
+    margin: 0 auto !important;
+}
+
+.chat-input {
+    width: 100% !important;
+    min-height: 45px !important;
+}
+
+/* ADD PADDING BOTTOM TO MAIN */
+main {
+    padding-bottom: 250px !important;
+}

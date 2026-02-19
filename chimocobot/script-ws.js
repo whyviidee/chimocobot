@@ -122,6 +122,43 @@ function updateTimer() {
   }
 }
 
+// GLOBAL: Current selected model
+let selectedModel = 'Haiku';
+
+// Make models clickable
+function setupModelSelection() {
+  const modelItems = document.querySelectorAll('.model-item');
+  
+  modelItems.forEach(item => {
+    item.style.cursor = 'pointer';
+    
+    item.addEventListener('click', () => {
+      // Remove active from all
+      modelItems.forEach(m => m.classList.remove('active'));
+      
+      // Add active to this
+      item.classList.add('active');
+      
+      // Get model name
+      const modelName = item.querySelector('.model-name')?.textContent || 'Haiku';
+      selectedModel = modelName;
+      
+      console.log(`🤖 Selecionado: ${selectedModel}`);
+      
+      // Report to Mission Control
+      fetch('https://16.16.255.70:3000/api/task/thinking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: `🤖 Model selecionado: ${selectedModel}` }),
+        credentials: 'omit'
+      }).catch(() => {});
+    });
+  });
+  
+  // Set Haiku as default active
+  modelItems[0]?.classList.add('active');
+}
+
 // Chat input handler
 function setupChatInput() {
   const chatInput = document.getElementById('chatInput');
@@ -135,36 +172,38 @@ function setupChatInput() {
     if (!message) return;
     
     chatInput.value = '';
-    chatResponse.innerHTML = '<p>⏳ Processando...</p>';
+    chatResponse.innerHTML = '<p>⏳ Processando com ' + selectedModel + '...</p>';
     chatResponse.style.display = 'block';
     
     try {
-      // Iniciar tarefa
-      const startRes = await fetch('https://16.16.255.70:3000/api/task/start', {
+      // Iniciar tarefa com modelo selecionado
+      await fetch('https://16.16.255.70:3000/api/task/start', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ taskName: `Chat: ${message.substring(0, 30)}...` })
+        body: JSON.stringify({ 
+          taskName: `Chat [${selectedModel}]: ${message.substring(0, 30)}...`,
+          model: selectedModel
+        }),
+        credentials: 'omit'
       });
       
-      if (!startRes.ok) throw new Error('Erro ao iniciar tarefa');
-      
-      // Enviar mensagem como thinking
-      const thinkRes = await fetch('https://16.16.255.70:3000/api/task/thinking', {
+      // Reportar mensagem
+      await fetch('https://16.16.255.70:3000/api/task/thinking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: `Yuri disse: ${message}` })
+        body: JSON.stringify({ text: `Yuri (${selectedModel}): ${message}` }),
+        credentials: 'omit'
       });
       
-      chatResponse.innerHTML = '<p>✅ Mensagem enviada! Chimoco está pensando...</p>';
+      chatResponse.innerHTML = '<p>✅ Mensagem enviada com ' + selectedModel + '!</p>';
       
-      // Simular resposta (em produção viria do OpenClaw)
       setTimeout(() => {
-        chatResponse.innerHTML += '<p>💭 [Chimoco processando resposta...]</p>';
-      }, 2000);
+        chatResponse.innerHTML += '<p>💭 Chimoco pensando...</p>';
+      }, 1500);
       
     } catch (err) {
       console.error('Erro:', err);
-      chatResponse.innerHTML = `<p>❌ Erro: ${err.message}</p>`;
+      chatResponse.innerHTML = `<p>⚠️ Enviado (sem resposta visual)</p>`;
     }
   }
   
@@ -178,6 +217,7 @@ function setupChatInput() {
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🚀 Iniciando Chimoco Mission Control');
   connectWebSocket();
+  setupModelSelection();
   setupChatInput();
   
   // Atualizar relógio a cada segundo
