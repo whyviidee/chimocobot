@@ -38,6 +38,8 @@ def generate_smart_response(message_text, model='Haiku'):
         return generate_openai_response(message_text, detected_intent)
     elif model == 'KIMI':
         return generate_kimi_response(message_text, detected_intent)
+    elif model == 'Ollama':
+        return generate_ollama_response(message_text, detected_intent)
     else:
         return generate_generic_response(message_text, detected_intent)
 
@@ -119,6 +121,43 @@ def generate_kimi_response(message, intent):
         return "DJ é arte. KIMI pode ajudar a analisar mix patterns, identificar transições ideais, sugerir tracks baseadas em harmonia e fluxo emocional. Qual é tua visão artística?"
     else:
         return f"'{message}' - KIMI está aqui para processar isto com profundidade. Deixa-me refletir e oferecer a melhor compreensão possível. Podes elaborar?"
+
+def generate_ollama_response(message, detected_intent):
+    """OLLAMA: Local LLM - Fast, private, no API keys needed"""
+    
+    # Try to get response from Ollama API
+    try:
+        import requests
+        import json
+        
+        # Ollama runs on localhost:11434
+        response = requests.post(
+            'http://localhost:11434/api/generate',
+            json={
+                'model': 'mistral',  # or 'llama2', 'neural-chat'
+                'prompt': f"Sou o Chimoco, assistente pessoal. Responde brevemente em português:\n\nYuri: {message}\n\nChimoco:",
+                'stream': False,
+                'temperature': 0.7
+            },
+            timeout=30
+        )
+        
+        if response.status_code == 200:
+            result = response.json()
+            return result.get('response', '').strip()
+    except Exception as e:
+        print(f"⚠️ Ollama not available: {e}")
+    
+    # Fallback responses if Ollama not running
+    if detected_intent == 'greeting':
+        return "E aí! Sou Chimoco rodando em Ollama - local, rápido e privado. Como posso ajudar?"
+    elif detected_intent == 'help':
+        return f"Claro! Com Ollama (local LLM), posso ajudar com: '{message}'. Tudo funciona localmente, sem depender de APIs externas."
+    elif detected_intent == 'time':
+        import time
+        return f"São {time.strftime('%H:%M')}. Ollama rodando localmente. Como posso otimizar o teu tempo?"
+    else:
+        return f"Recebi: '{message}'. Ollama processando localmente. Que precisa exatamente?"
 
 def generate_generic_response(message, intent):
     """Generic: Fallback quando modelo é desconhecido"""
