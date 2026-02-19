@@ -7,6 +7,24 @@ from chimoco_wrapper import report_task, report_thinking, report_action
 from chimoco_api import chimoco
 
 # ============================================
+# INTEGRAÇÃO COM MISSION CONTROL
+# ============================================
+
+def report_to_mission_control(action, message):
+    """Send updates to Mission Control dashboard"""
+    try:
+        from chimoco_mission_reporter import report_thinking, report_response
+        
+        if action == "thinking":
+            report_thinking(message)
+        elif action == "response":
+            report_response(message, is_complete=False)
+        elif action == "complete":
+            report_response(message, is_complete=True)
+    except Exception as e:
+        print(f"⚠️ Mission Control report failed: {e}")
+
+# ============================================
 # INTEGRAÇÃO COM CALENDÁRIO
 # ============================================
 

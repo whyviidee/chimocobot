@@ -122,10 +122,63 @@ function updateTimer() {
   }
 }
 
+// Chat input handler
+function setupChatInput() {
+  const chatInput = document.getElementById('chatInput');
+  const chatSend = document.getElementById('chatSend');
+  const chatResponse = document.getElementById('chatResponse');
+  
+  if (!chatInput || !chatSend) return;
+  
+  async function sendMessage() {
+    const message = chatInput.value.trim();
+    if (!message) return;
+    
+    chatInput.value = '';
+    chatResponse.innerHTML = '<p>⏳ Processando...</p>';
+    chatResponse.style.display = 'block';
+    
+    try {
+      // Iniciar tarefa
+      const startRes = await fetch('https://16.16.255.70:3000/api/task/start', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskName: `Chat: ${message.substring(0, 30)}...` })
+      });
+      
+      if (!startRes.ok) throw new Error('Erro ao iniciar tarefa');
+      
+      // Enviar mensagem como thinking
+      const thinkRes = await fetch('https://16.16.255.70:3000/api/task/thinking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: `Yuri disse: ${message}` })
+      });
+      
+      chatResponse.innerHTML = '<p>✅ Mensagem enviada! Chimoco está pensando...</p>';
+      
+      // Simular resposta (em produção viria do OpenClaw)
+      setTimeout(() => {
+        chatResponse.innerHTML += '<p>💭 [Chimoco processando resposta...]</p>';
+      }, 2000);
+      
+    } catch (err) {
+      console.error('Erro:', err);
+      chatResponse.innerHTML = `<p>❌ Erro: ${err.message}</p>`;
+    }
+  }
+  
+  chatSend.addEventListener('click', sendMessage);
+  chatInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') sendMessage();
+  });
+}
+
 // Iniciar quando a página carrega
 document.addEventListener('DOMContentLoaded', () => {
   console.log('🚀 Iniciando Chimoco Mission Control');
   connectWebSocket();
+  setupChatInput();
   
   // Atualizar relógio a cada segundo
   setInterval(updateTimer, 1000);
