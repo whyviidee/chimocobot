@@ -186,7 +186,7 @@ app.post('/api/reset', (req, res) => {
   res.json({ success: true });
 });
 
-// API - Chat Message
+// API - Chat Message from Dashboard
 app.post('/api/chat/message', (req, res) => {
   const { message, model } = req.body;
   
@@ -203,6 +203,15 @@ app.post('/api/chat/message', (req, res) => {
     model: model || 'Haiku'
   };
   
+  // Add to history
+  const historyItem = {
+    timestamp: new Date().toISOString(),
+    taskName: `Yuri: ${message}`,
+    type: 'user_message'
+  };
+  taskHistory.push(historyItem);
+  if (taskHistory.length > 20) taskHistory.shift();
+  
   // Broadcast to clients
   broadcastToClients({
     type: 'task_start',
@@ -215,9 +224,50 @@ app.post('/api/chat/message', (req, res) => {
     text: `📨 Yuri: ${message}`
   });
   
+  // Store message for processing
+  const messageObj = {
+    id: Date.now(),
+    text: message,
+    model: model || 'Haiku',
+    timestamp: new Date().toISOString(),
+    status: 'pending'
+  };
+  
+  // Make available for external processing
+  global.pendingDashboardMessage = messageObj;
+  
   res.json({ 
     success: true,
-    message: 'Processing...'
+    messageId: messageObj.id,
+    message: 'Message queued'
+  });
+});
+
+// API - Submit Response from Chimoco
+app.post('/api/response/submit', (req, res) => {
+  const { responseText, messageId } = req.body;
+  
+  if (!responseText) {
+    return res.status(400).json({ error: 'Response required' });
+  }
+  
+  // Broadcast response to dashboard
+  broadcastToClients({
+    type: 'thinking',
+    text: `📤 Chimoco: ${responseText}`
+  });
+  
+  // Add to history
+  taskHistory.push({
+    timestamp: new Date().toISOString(),
+    taskName: `Response: ${responseText.substring(0, 50)}...`,
+    type: 'response'
+  });
+  if (taskHistory.length > 20) taskHistory.shift();
+  
+  res.json({
+    success: true,
+    message: 'Response submitted'
   });
 });
 
